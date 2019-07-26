@@ -1,50 +1,35 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-
 public class EchoServer {
+    private SocketWrapper socketWrapper;
 
-    public static void main(String[] args) throws IOException {
-        ServerSocket serverSock = null;
-        try{
-            serverSock = new ServerSocket(8899);
-        } catch (IOException e) {
-            System.out.println("[-]Can't listen on port number 8899.");
-            System.exit(1);
-        }
+    public EchoServer(SocketWrapper socketWrapper) {
+        this.socketWrapper = socketWrapper;
+    }
 
-        Socket clientSock = null;
-        System.out.println("[+]Listening for connect...");
-        try{
-            clientSock = serverSock.accept();
-        } catch (IOException e) {
-            System.out.println("[-]Accept failed.");
-            System.exit(1);
-        }
+    void start(int port) {
+        socketWrapper.createAndListen(port);
+        run();
+    }
 
-        System.out.println("[+]Connection successfull.");
-        System.out.println("[+]Listening for input.");
-
-        PrintWriter output = new PrintWriter(clientSock.getOutputStream(), true);
-        BufferedReader input = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
-
-        String inputLine;
-
-        while((inputLine = input.readLine()) != null) {
-            System.out.println("Server: " + inputLine);
-            output.println(inputLine);
-
-            if(inputLine.equals("Bye")) {
-                break;
+    private void run() {
+        String message = socketWrapper.receive();
+        while(message != null) {
+            if(message == "bye") {
+                socketWrapper.send(message);
+                stop();
+            } else {
+                socketWrapper.send(message);
+                run();
             }
         }
+    }
 
-        output.close();
-        input.close();
-        clientSock.close();
-        serverSock.close();
+    private void stop() {
+        socketWrapper.close();
+    }
+
+    public static void main(String[] args) {
+        SocketWrapper socketWrapper = new ServerSocketWrapper();
+        EchoServer echoServer = new EchoServer(socketWrapper);
+        echoServer.start(Integer.parseInt(args[0]));
     }
 }
