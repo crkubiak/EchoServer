@@ -4,7 +4,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class ServerSocketWrapper implements SocketWrapper {
     private ServerSocket serverSocket;
@@ -19,7 +18,9 @@ public class ServerSocketWrapper implements SocketWrapper {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
-            System.err.println("Error");
+            System.err.println("[-]Connection error.");
+            throw new ServerConnectionException();
+
         }
     }
 
@@ -27,8 +28,8 @@ public class ServerSocketWrapper implements SocketWrapper {
         try {
             return input.readLine();
         } catch (IOException e) {
-            System.err.println("Error");
-            return "Error";
+            System.err.println("[-]Input not received.");
+            throw new ServerConnectionException();
         }
     }
 
@@ -43,7 +44,8 @@ public class ServerSocketWrapper implements SocketWrapper {
             socket.close();
             serverSocket.close();
         } catch (IOException e) {
-            System.err.println("Error");
+            System.err.println("[-]Shutdown error.");
+            throw new ServerConnectionException();
         }
     }
 }

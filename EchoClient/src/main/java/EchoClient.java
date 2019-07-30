@@ -15,7 +15,7 @@ public class EchoClient {
         BufferedReader input = null;
 
         try {
-            socket = new Socket("127.0.0.1", 8899);
+            socket = new Socket("127.0.0.1", 8080);
             output = new PrintWriter(socket.getOutputStream(), true);
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (UnknownHostException e) {
