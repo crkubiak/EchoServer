@@ -15,14 +15,14 @@ public class EchoClient {
         BufferedReader input = null;
 
         try {
-            socket = new Socket("127.0.0.1", 8080);
+            socket = new Socket("127.0.0.1", Integer.parseInt(args[0]));
             output = new PrintWriter(socket.getOutputStream(), true);
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (UnknownHostException e) {
             System.out.println("[-]Unknown Host.");
             System.exit(1);
         } catch (IOException e) {
-            System.out.println("[-]Can't connect to server.");
+            System.out.println("[-]Can't connect to the server.");
             System.exit(1);
         }
 
